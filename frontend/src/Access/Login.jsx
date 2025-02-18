@@ -9,6 +9,8 @@ export default function Login({ onSwitchToSignup }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const switchToSignup = onSwitchToSignup || (() => navigate('/signup'));
+
   const showLoading = () => setLoading(true);
   const hideLoading = () => setLoading(false);
 
@@ -110,7 +112,7 @@ export default function Login({ onSwitchToSignup }) {
         <div className="mt-6 text-center">
           <p>
             Don't have an account?{" "}
-            <button onClick={onSwitchToSignup} className="text-blue-600 underline">
+            <button onClick={switchToSignup} className="text-blue-600 underline">
               Sign Up
             </button>
           </p>
