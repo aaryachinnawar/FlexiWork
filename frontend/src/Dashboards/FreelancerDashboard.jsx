@@ -54,7 +54,7 @@ export default function FreelancerDashboard() {
         {/* Navigation Buttons */}
         <div className="flex gap-4 mb-8">
           <Link to="/jobs" className="neo-button bg-[#4ECDC4] text-black font-bold py-2 px-4">
-            Browse Jobs
+            View Jobs
           </Link>
           <button className="neo-button bg-[#FF6B6B] text-white font-bold py-2 px-4">
             Messages

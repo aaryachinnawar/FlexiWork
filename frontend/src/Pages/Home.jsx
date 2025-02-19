@@ -1,4 +1,3 @@
-import React from "react";
 import Nav from "../components/Nav";
 import { motion } from "framer-motion";
 import Demo from "../assets/Demo.mp4";
@@ -32,7 +31,7 @@ const Home = () => {
               Run an organization where members get rewarded for their contributions with fractional ownership.
             </p>
             <br />
-            <button class="bg-[#71A894] hover:bg-[#71a8948c]  text-white font-bold py-2 px-4 rounded-full">
+            <button className="bg-[#71A894] hover:bg-[#71a8948c]  text-white font-bold py-2 px-4 rounded-full">
              Get Started</button>
           </motion.div>
 

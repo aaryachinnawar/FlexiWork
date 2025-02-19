@@ -3,15 +3,15 @@ import { useNavigate } from "react-router-dom"; // Add this
 import LoadingSpinner from "../components/LoadingSpinner"; 
 import Scene3D from "../components/Scene3D";
 import axios from "axios";
+import toast from "react-hot-toast";
 const VITE_APP_API = import.meta.env.VITE_APP_API;
 
-export default function Login({ onSwitchToSignup }) {
+export default function Login() {
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // Add this
+  const navigate = useNavigate(); 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const switchToSignup = onSwitchToSignup || (() => navigate('/signup'));
+  
 
   const showLoading = () => setLoading(true);
   const hideLoading = () => setLoading(false);
@@ -37,23 +37,31 @@ export default function Login({ onSwitchToSignup }) {
 
   const handleLogin =async (e) => {
     e.preventDefault();
-    showLoading();
-    const res = await axios.post(
-        `${VITE_APP_API}/api/auth/login`,
-        {email, password,role},
-        { headers : { "Content-Type": "application/json" } }
-      )
-    const role = res.data.role;
-    if (role === "freelancer") {
-      navigate("/dashboard"); 
-    } else {
-      navigate("/client-dashboard");
+    try{
+      const res = await axios.post(
+          `${VITE_APP_API}/api/auth/login`,
+          {email, password},
+          { headers : { "Content-Type": "application/json" } }
+        )
+        console.log(res.data)
+        const {client,freelancer} = res.data;
+        toast.success(res.data.message);
+        localStorage.setItem("token",res.data.token)
+        if(freelancer){
+              navigate('/dashboard')
+        }else if(client){
+          navigate('/client-dashboard')
+        }else{
+          toast.error("Invalid Credentials")
+        }
+    }catch(error){
+      toast.error(error.response?.data?.message || "Login failed");
     }
   };
 
   return (
     <div className="relative container mx-auto px-4 py-8 h-screen flex items-center justify-center">
-       <LoadingSpinner loading={loading} />
+      <LoadingSpinner loading={loading} />
       
       <div className="flex w-full h-full"> {/* Flex container */}
 
@@ -65,7 +73,7 @@ export default function Login({ onSwitchToSignup }) {
       {/* Right Side: Login Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center">
       <div className="max-w-xl w-full bg-white neo-brutalist p-10 rounded-lg shadow-lg min-h-[500px]">
-        <h1 className="text-4xl font-bold mb-6 text-center">FreeLanceNeo</h1>
+        <h1 className="text-4xl font-bold mb-6 text-center">FlexiWork</h1>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block font-bold mb-2">Email</label>
@@ -109,15 +117,6 @@ export default function Login({ onSwitchToSignup }) {
           >
             <i className="bi bi-facebook"></i> Continue with Facebook
           </button>
-        </div>
-
-        <div className="mt-6 text-center">
-          <p>
-            Don't have an account?{" "}
-            <button onClick={switchToSignup} className="text-blue-600 underline">
-              Sign Up
-            </button>
-          </p>
         </div>
       </div>
       </div>
