@@ -1,29 +1,32 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
+const freelancerSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        trim: true,
     },
     email: {
         type: String,
         required: true,
         unique: true,
+        trim: true,
     },
     password: {
         type: String,
         required: true,
     },
-    phone: {
+    skills: {
+        type: [String],
+        required: true,
+    },
+    isAvailable: {
+        type: Boolean,
+        default: true,
+    },
+    experience: {
         type: String,
         required: true,
     },
-    role:{
-        type: String,
-        required: true,
-        enum: ['freelancer','client'],
-    }
-},{timestamps: true});
+});
 
-export default  mongoose.model('user', userSchema);
+export default mongoose.model('Freelancer', freelancerSchema);

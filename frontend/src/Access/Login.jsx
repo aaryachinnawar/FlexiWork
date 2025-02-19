@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Add this
 import LoadingSpinner from "../components/LoadingSpinner"; 
 import Scene3D from "../components/Scene3D";
+import axios from "axios";
+const VITE_APP_API = import.meta.env.VITE_APP_API;
 
 export default function Login({ onSwitchToSignup }) {
   const [loading, setLoading] = useState(false);
@@ -33,20 +35,20 @@ export default function Login({ onSwitchToSignup }) {
     }
   };
 
-  const handleLogin = (e) => {
+  const handleLogin =async (e) => {
     e.preventDefault();
     showLoading();
-    setTimeout(() => {
-      hideLoading();
-      alert("Login successful!");
-      // Simulate role-based redirection
-      const role = localStorage.getItem("userRole"); // Assume role is stored during signup
-      if (role === "freelancer") {
-        navigate("/dashboard"); // Freelancer Dashboard
-      } else {
-        navigate("/client-dashboard"); // Client Dashboard
-      }
-    }, 1500);
+    const res = await axios.post(
+        `${VITE_APP_API}/api/auth/login`,
+        {email, password,role},
+        { headers : { "Content-Type": "application/json" } }
+      )
+    const role = res.data.role;
+    if (role === "freelancer") {
+      navigate("/dashboard"); 
+    } else {
+      navigate("/client-dashboard");
+    }
   };
 
   return (
