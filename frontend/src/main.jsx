@@ -11,10 +11,12 @@ import './Font'; // Import fonts
 import "./index.css";
 import Jobs from "./Pages/Jobs";
 import { Toaster } from 'react-hot-toast'
+import { AuthProvider } from "./context/AuthContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
       <BrowserRouter>
+      <AuthProvider>
         <Toaster position="top-right" reverseOrder={false}/>
         <Routes>
           <Route path="/" element={<App />} />
@@ -25,6 +27,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="/client-dashboard" element={<ClientDashboard />} />
           <Route path="/jobs" element={<JobListings />} />
         </Routes>
+      </AuthProvider>
       </BrowserRouter>
   </React.StrictMode>
 );

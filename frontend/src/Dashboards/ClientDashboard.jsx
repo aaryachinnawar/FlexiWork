@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Pie, Bar } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from "chart.js";
+import Nav from "../components/Nav";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -52,6 +53,7 @@ export default function ClientDashboard() {
 
   return (
     <div className="bg-[#E0F4FF] min-h-screen p-8">
+      <Nav/>
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold mb-8">Client Dashboard</h1>
 

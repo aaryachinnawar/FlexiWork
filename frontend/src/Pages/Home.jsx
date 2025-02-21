@@ -32,7 +32,7 @@ const Home = () => {
             </p>
             <br />
             <button className="bg-[#71A894] hover:bg-[#71a8948c]  text-white font-bold py-2 px-4 rounded-full">
-             Get Started</button>
+              Get Started</button>
           </motion.div>
 
           {/* Video Section */}

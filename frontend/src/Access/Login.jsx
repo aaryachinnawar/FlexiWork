@@ -5,12 +5,15 @@ import Scene3D from "../components/Scene3D";
 import axios from "axios";
 import toast from "react-hot-toast";
 const VITE_APP_API = import.meta.env.VITE_APP_API;
+import { useAuth } from "../context/AuthContext";
+import Nav from "../components/Nav";
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const {auth,setAuth} = useAuth();
 
   const showLoading = () => setLoading(true);
   const hideLoading = () => setLoading(false);
@@ -43,9 +46,16 @@ export default function Login() {
         { headers: { "Content-Type": "application/json" } }
       );
       console.log(res.data);
-      const { client, freelancer } = res.data;
+      const { client, freelancer,token } = res.data;
       toast.success(res.data.message);
-      localStorage.setItem("token", res.data.token);
+      setAuth({
+        ...auth,
+        freelancer: freelancer || null,
+        client: client || null, 
+        token: token
+      })
+      
+      localStorage.setItem('auth',JSON.stringify({freelancer,client,token}))
       if (freelancer) {
         navigate("/dashboard");
       } else if (client) {
