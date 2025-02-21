@@ -4,7 +4,7 @@ import Scene3D from "../components/Scene3D"
 import axios from "axios";
 const VITE_APP_API = import.meta.env.VITE_APP_API;
 import toast from "react-hot-toast";
-
+import { Link } from "react-router-dom";
 
 export default function Signup() {
   const [userType, setUserType] = useState("client");
@@ -99,9 +99,21 @@ export default function Signup() {
             </div>
           )}
 
-          <button type="submit" className="w-full neo-button bg-purple-500 text-white font-bold py-2 px-4">
-            Create Account
-          </button>
+          <div className="flex flex-col space-y-2">
+            <button type="submit" className="w-full neo-button bg-purple-500 text-white font-bold py-2 px-4">
+              Create Account
+            </button>
+                  
+            <Link
+              to='/login'
+              className="w-full text-center bg-blue-500 text-white font-bold py-2 px-4 rounded-lg mt-2"
+            >
+              Already have an account? Log in
+            </Link>
+          </div>
+
+          
+          
         </form>
       </div>
     </div>
