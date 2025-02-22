@@ -6,7 +6,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 const VITE_APP_API = import.meta.env.VITE_APP_API;
 import { useAuth } from "../context/AuthContext";
-import Nav from "../components/Nav";
+import Nav2 from "../components/Nav2";
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
@@ -69,7 +69,10 @@ export default function Login() {
   };
 
   return (
-    <div className="relative container mx-auto px-4 py-8 h-screen flex items-center justify-center">
+    <div className="relative container mx-auto px-4 py-8 h-screen flex items-center justify-center bg-[#dbf5ff]">
+      
+      <Nav2/>
+      <br /><br />
       <LoadingSpinner loading={loading} />
 
       <div className="flex w-full h-full">
@@ -79,7 +82,7 @@ export default function Login() {
         </div>
 
         {/* Right Side: Login Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center">
+        <div className="w-full lg:w-1/2 flex items-center justify-center bg-[#dbf5ff] mt-18">
           <div className="max-w-xl w-full bg-white neo-brutalist p-10 rounded-lg shadow-lg min-h-[500px]">
             <h1 className="text-4xl font-bold mb-6 text-center">FlexiWork</h1>
 

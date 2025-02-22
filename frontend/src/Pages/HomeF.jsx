@@ -1,4 +1,4 @@
-import Nav from "../components/Nav";
+import NavF from "../components/NavF";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Demo from "../assets/Demo.mp4";
@@ -13,7 +13,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <Nav />
+      <NavF />
 
       {/* Main Content */}
       <div className="pt-[210px] px-20">

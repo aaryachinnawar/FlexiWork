@@ -2,19 +2,20 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Pie, Bar } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from "chart.js";
-import Nav from "../components/Nav";
+import NavC from "../components/NavC";
+import Talents from "../components/Talents";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 export default function ClientDashboard() {
   const [showJobForm, setShowJobForm] = useState(false);
   const [jobs, setJobs] = useState([]);
-  const [activeTab, setActiveTab] = useState("projects");
+  const [activeTab, setActiveTab] = useState("talents");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     budget: "",
-    deadline: ""
+    skills: ""
   });
 
   // Mock data for charts
@@ -53,12 +54,13 @@ export default function ClientDashboard() {
 
   return (
     <div className="bg-[#E0F4FF] min-h-screen p-8">
-      <Nav/>
+      <NavC/>
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold mb-8">Client Dashboard</h1>
 
         {/* Navigation */}
         <div className="flex gap-4 mb-8">
+
           <button
             onClick={() => setActiveTab("projects")}
             className={`neo-button ${activeTab === "projects" ? "bg-[#4ECDC4]" : "bg-white"}`}
@@ -72,12 +74,25 @@ export default function ClientDashboard() {
             Payments
           </button>
           <button
+            onClick={() => setActiveTab("talents")}
+            className={`neo-button ${activeTab === "talents" ? "bg-[#4ECDC4]" : "bg-white"}`}
+          >
+            Find Talents
+          </button>
+          <button
             onClick={() => setShowJobForm(true)}
             className="neo-button bg-[#FF6B6B] text-white"
           >
             Post New Job
           </button>
+          
         </div>
+
+            {/* Default Talents View */}
+            {activeTab === "talents" && <Talents />}
+
+            {/* Other Conditional Views */}
+      
 
         {/* Job Posting Form */}
         {showJobForm && (
@@ -108,13 +123,16 @@ export default function ClientDashboard() {
                   className="p-2 neo-brutalist"
                   required
                 />
-                <input
-                  type="date"
-                  value={formData.deadline}
-                  onChange={(e) => setFormData({...formData, deadline: e.target.value})}
+                <input 
+                  type="text"
+                  placeholder="Skills"
+                  value={formData.skills}
+                  onChange={(e) => setFormData({...formData, skills: e.target.value})}
                   className="p-2 neo-brutalist"
                   required
+                
                 />
+             
               </div>
               <button type="submit" className="neo-button bg-[#4ECDC4] text-black">
                 Post Job

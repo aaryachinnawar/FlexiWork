@@ -32,7 +32,7 @@ const Nav = () => {
       </div>
 
       <div className="flex gap-16 absolute left-1/2 -translate-x-1/2">
-        <button className="font-Akatab-ExtraBold font-extrabold text-xl text-black cursor-pointer" onClick={() => navigate('/')}>
+        <button className="font-Akatab-ExtraBold font-extrabold text-xl text-black cursor-pointer" onClick={() => navigate('/homeC')}>
           HOME
         </button>
         <button className="font-Akatab-ExtraBold font-extrabold text-xl text-black cursor-pointer">
@@ -40,6 +40,9 @@ const Nav = () => {
         </button>
         <button className="font-Akatab-ExtraBold font-extrabold text-xl text-black cursor-pointer">
           CONTACT US
+        </button>
+        <button className="font-Akatab-ExtraBold font-extrabold text-xl text-black cursor-pointer " onClick={()=> navigate('/client-dashboard')}>
+          FIND TALENT
         </button>
       </div>
 

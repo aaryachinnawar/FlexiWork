@@ -43,7 +43,7 @@ const Nav = () => {
         </button>
       </div>
 
-      {
+      {/* {
         (!auth.freelancer && !auth.client) ? (
           <div className="flex items-center gap-8">
         <button className="font-Akatab-ExtraBold font-extrabold text-xl text-[#71A894]" onClick={() => navigate('/login')}>
@@ -61,7 +61,7 @@ const Nav = () => {
         </button>
           </div>
         </>)
-      }
+      } */}
       
     </div>
   );

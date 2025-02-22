@@ -5,6 +5,7 @@ import axios from "axios";
 const VITE_APP_API = import.meta.env.VITE_APP_API;
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import Nav2 from "../components/Nav2";
 
 export default function Signup() {
   const [userType, setUserType] = useState("client");
@@ -35,10 +36,12 @@ export default function Signup() {
 
 
   return (
-    <div className="relative container mx-auto px-4 py-8 h-screen flex items-center justify-center">
+    <div className="relative container mx-auto px-4 py-8 h-screen flex items-center justify-center bg-[#dbf5ff]">
       
 
       <div className="flex w-full h-full"> {/* Flex container */}
+      
+      <Nav2 />
       
       {/* Left Side: 3D Scene */}
       <div className="w-1/2 hidden lg:block"> {/* Half width on large screens */}
@@ -46,9 +49,9 @@ export default function Signup() {
         </div>
 
        {/* Right Side: Signup Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center">
-      <div className="max-w-xl w-full bg-white neo-brutalist p-10 rounded-lg shadow-lg min-h-[500px]">
-        <h1 className="text-4xl font-bold mb-6 text-center">Create Account</h1>
+      <div className="w-full lg:w-1/2 flex items-center justify-center mt-18">
+      <div className="max-w-xl w-full bg-white neo-brutalist p-10 rounded-lg shadow-lg min-h-[20px]">
+        <h1 className="text-4xl font-bold mb-5 mt-7 text-center">Create Account</h1>
 
         <div className="mb-6 space-x-4 text-center">
           <select
@@ -82,8 +85,9 @@ export default function Signup() {
             className="w-full p-2 neo-brutalist" required />
           </div>
 
+           
           {userType === "freelancer" && (
-            <div className="space-y-4">
+            <div className="space-y-4  " >
               <div>
                 <label className="block font-bold mb-2">Skills (comma-separated)</label>
                 <input type="text" 

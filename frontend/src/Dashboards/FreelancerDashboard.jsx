@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Pie, Bar } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from "chart.js";
-import Nav from "../components/Nav";
+import NavF from "../components/NavF";
+import job from "../Pages/Jobs"
+import Jobs from "../Pages/Jobs";
 
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
@@ -49,7 +51,7 @@ export default function FreelancerDashboard() {
 
   return (
     <div className="bg-[#E0F4FF] min-h-screen p-8">
-      <Nav/>
+      <NavF/>
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold mb-8">Freelancer Dashboard</h1>
 
@@ -105,8 +107,8 @@ export default function FreelancerDashboard() {
         </div>
 
         {/* Earnings and Analytics Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white neo-brutalist p-6">
+        <div className="">
+          {/* <div className="bg-white neo-brutalist p-6">
             <h2 className="text-2xl font-bold mb-4">Earnings Overview</h2>
             <Pie data={earningsData} />
           </div>
@@ -114,7 +116,9 @@ export default function FreelancerDashboard() {
           <div className="bg-white neo-brutalist p-6">
             <h2 className="text-2xl font-bold mb-4">Monthly Analytics</h2>
             <Bar data={analyticsData} />
-          </div>
+          </div> */}
+           <Jobs/>
+
         </div>
       </div>
     </div>
