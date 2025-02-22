@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext, createContext } from "react";
-
+import axios from "axios";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
         client: null,
         token: "",
     });
-
+    axios.defaults.headers.common['Authorization'] = auth?.token
     useEffect(() => {
         const data = localStorage.getItem("auth");
         if (data) {
@@ -20,6 +20,15 @@ export const AuthProvider = ({ children }) => {
             });
         }
     }, []);
+
+     useEffect(() => {
+        if (auth?.token) {
+            axios.defaults.headers.common["Authorization"] = `Bearer ${auth.token}`;
+        } else {
+            delete axios.defaults.headers.common["Authorization"];
+        }
+    }, [auth.token]);
+
 
     return (
         <AuthContext.Provider value={{ auth, setAuth }}>

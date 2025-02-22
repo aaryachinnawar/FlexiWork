@@ -1,23 +1,7 @@
 
-@tailwind base;
-@tailwind components;
+@import "tailwindcss";
 @tailwind utilities;
 
-
-/* :root {
-  --foreground-rgb: 48, 48, 49;
-  --background-rgb: 248, 242, 228;
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
-  font-family: "Inter", sans-serif;
-}
-
-.font-serif {
-  font-family: "Playfair Display", serif;
-} */
 
 
 .neo-brutalist {
