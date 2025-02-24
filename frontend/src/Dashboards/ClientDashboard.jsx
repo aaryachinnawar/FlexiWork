@@ -43,11 +43,9 @@ export default function ClientDashboard() {
     const fetchJobs = async () => {
       try {
         const { data } = await axios.get(`${VITE_APP_API}/api/jobs`, {
-          headers: { Authorization: `Bearer ${auth.token}` }
+          headers: { Authorization: `Bearer ${auth.token}` },
         });
-  
-
-  
+    
         if (auth.client && Array.isArray(data)) {
           const clientJobs = data.filter(job => job.client?._id === auth.client._id);
           setJobs(clientJobs);
@@ -88,24 +86,47 @@ export default function ClientDashboard() {
   
   const handleJobRequest = async (requestId, status) => {
     try {
-        await axios.patch(`${VITE_APP_API}/api/jobs/request/respond`, 
-            { requestId, status }, 
-            { headers: { Authorization: `Bearer ${auth.token}` } }
-        );
-
-        // Update UI
-        setJobRequests(prevRequests => prevRequests.map(req => 
-            req._id === requestId ? { ...req, status } : req
-        ));
-
-        toast.success(`Request ${status}`);
-    } catch (error) {
-        console.error(`Error ${status} request:`, error);
-        toast.error(`Failed to ${status} request`);
-    }
-};
-
+      // Update the job request status
+      await axios.patch(
+        `${VITE_APP_API}/api/jobs/request/respond`,
+        { requestId, status },
+        { headers: { Authorization: `Bearer ${auth.token}` } }
+      );
   
+      // If the request is accepted, update the job status to "hired"
+      if (status === "accepted") {
+        const request = jobRequests.find(req => req._id === requestId);
+        if (request) {
+          await axios.patch(
+            `${VITE_APP_API}/api/jobs/${request.job._id}`,
+            { status: "hired", freelancer: request.freelancer._id },
+            { headers: { Authorization: `Bearer ${auth.token}` } }
+          );
+  
+          // Update the jobs state
+          setJobs(prevJobs =>
+            prevJobs.map(job =>
+              job._id === request.job._id
+                ? { ...job, status: "hired", freelancer: request.freelancer }
+                : job
+            )
+          );
+        }
+      }
+  
+      // Update the jobRequests state
+      setJobRequests(prevRequests =>
+        prevRequests.map(req =>
+          req._id === requestId ? { ...req, status } : req
+        )
+      );
+  
+      toast.success(`Request ${status}`);
+    } catch (error) {
+      console.error(`Error ${status} request:`, error);
+      toast.error(`Failed to ${status} request`);
+    }
+  };
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -121,7 +142,7 @@ const handleSubmit = async (e) => {
 
     // Fetch updated jobs
     const { data } = await axios.get(`${VITE_APP_API}/api/jobs`);
-    setJobs(data.filter(job => job.client?._id === auth.client._id));
+    setJobs(data.filter(job => job.client?._id === auth.client._id ));
   } catch (error) {
     toast.error("Failed to post job");
     console.error("Error posting job:", error);
@@ -229,11 +250,15 @@ const handleSubmit = async (e) => {
           </div>
         )}
 
-        {/* Active Projects */} 
-        {activeTab === "projects" && (
-      <div className="space-y-6">
-        {jobs.map(job => (
-          <div key={job._id} className="bg-white neo-brutalist p-6 animate-fadeIn">
+{activeTab === "projects" && (
+  <div className="space-y-6">
+    {/* Open Projects */}
+    <div>
+      <h2 className="text-2xl font-bold mb-4">Open Projects</h2>
+      {jobs
+        .filter(job => job.status === "open")
+        .map(job => (
+          <div key={job._id} className="bg-white neo-brutalist p-6 animate-fadeIn mb-6">
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h3 className="text-xl font-bold">{job.title}</h3>
@@ -242,46 +267,123 @@ const handleSubmit = async (e) => {
               <span className="neo-brutalist px-3 py-1 text-sm">{job.status}</span>
             </div>
             <p className="mb-4">{job.description}</p>
-        
-            {/* Show Freelancer Requests for this Job */}
+
+            {/* Freelancer Requests */}
             <h4 className="text-lg font-bold mt-4">Freelancer Requests:</h4>
             {Array.isArray(jobRequests) && jobRequests.length > 0 ? (
-  jobRequests?.filter(req => req.job && req.job._id === job._id).map(request => (
-    <div key={request._id} className="bg-gray-100 p-4 rounded-md mt-2">
-      <p><strong>Freelancer:</strong> {request.freelancer.name}</p>
-      <p><strong>Status:</strong> {request.status}</p>
+              jobRequests
+                .filter(req => req.job && req.job._id === job._id)
+                .map(request => (
+                  <div key={request._id} className="bg-gray-100 p-4 rounded-md mt-2">
+                    {/* Freelancer Profile */}
+                    <div className="mb-4">
+                      <h4 className="text-lg font-bold">Freelancer Profile:</h4>
+                      <div className="bg-white p-4 rounded-md">
+                        <p><strong>Name:</strong> {request.freelancer.name}</p>
+                        <p><strong>Email:</strong> {request.freelancer.email}</p>
+                        <p><strong>Skills:</strong> {request.freelancer.skills.join(", ")}</p>
+                        <p><strong>Experience:</strong> {request.freelancer.experience}</p>
+                      </div>
+                    </div>
 
-      {request.status === "pending" && (
-        <div className="mt-2">
-          <button 
-            onClick={() => handleJobRequest(request._id, "accepted")} 
-            className="neo-button bg-green-500 text-white mr-2"
-          >
-            Accept
-          </button>
-          <button 
-            onClick={() => handleJobRequest(request._id, "rejected")} 
-            className="neo-button bg-red-500 text-white"
-          >
-            Reject
-          </button>
-        </div>
-      )}
+                    {/* Request Status and Actions */}
+                    <p><strong>Status:</strong> {request.status}</p>
 
-      {request.status === "accepted" && (
-        <PaymentButton job={job._id} client={job.client} freelancer={job.freelancer} amount={job.budget} />
-      )}
-    </div>
-  ))
-) : (
-  <p className="text-gray-500">No requests yet.</p>
-)}
-
+                    {request.status === "pending" && (
+                      <div className="mt-2">
+                        <button
+                          onClick={() => handleJobRequest(request._id, "accepted")}
+                          className="neo-button bg-green-500 text-white mr-2"
+                        >
+                          Accept
+                        </button>
+                        <button
+                          onClick={() => handleJobRequest(request._id, "rejected")}
+                          className="neo-button bg-red-500 text-white"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))
+            ) : (
+              <p className="text-gray-500">No requests yet.</p>
+            )}
           </div>
         ))}
-      </div>
-    )}
+    </div>
 
+    {/* Hired Freelancers */}
+    <div>
+      <h2 className="text-2xl font-bold mb-4">Hired Freelancers</h2>
+      {jobs
+        .filter(job => job.status === "hired")
+        .map(job => (
+          <div key={job._id} className="bg-white neo-brutalist p-6 animate-fadeIn mb-6">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h3 className="text-xl font-bold">{job.title}</h3>
+                <p className="text-gray-600">Budget: ${job.budget}</p>
+              </div>
+              <span className="neo-brutalist px-3 py-1 text-sm">{job.status}</span>
+            </div>
+            <p className="mb-4">{job.description}</p>
+
+            {/* Freelancer Profile */}
+            {job.freelancer && (
+              <div className="mt-4">
+                <h4 className="text-lg font-bold">Hired Freelancer:</h4>
+                <div className="bg-gray-100 p-4 rounded-md mt-2">
+                  <p><strong>Name:</strong> {job.freelancer.name}</p>
+                  <p><strong>Email:</strong> {job.freelancer.email}</p>
+                  <p><strong>Skills:</strong> {job.freelancer.skills.join(", ")}</p>
+                  <p><strong>Experience:</strong> {job.freelancer.experience}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Payment Button */}
+            <div className="mt-4">
+              <PaymentButton job={job._id} client={job.client} freelancer={job.freelancer} amount={job.budget} />
+            </div>
+          </div>
+        ))}
+    </div>
+
+    {/* Completed Jobs */}
+    <div>
+      <h2 className="text-2xl font-bold mb-4">Completed Jobs</h2>
+      {jobs
+        .filter(job => job.status === "completed")
+        .map(job => (
+          <div key={job._id} className="bg-white neo-brutalist p-6 animate-fadeIn mb-6">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h3 className="text-xl font-bold">{job.title}</h3>
+                <p className="text-gray-600">Budget: ${job.budget}</p>
+              </div>
+              <span className="neo-brutalist px-3 py-1 text-sm">{job.status}</span>
+            </div>
+            <p className="mb-4">{job.description}</p>
+
+            {/* Freelancer Profile */}
+            {job.freelancer && (
+              <div className="mt-4">
+                <h4 className="text-lg font-bold">Freelancer:</h4>
+                <div className="bg-gray-100 p-4 rounded-md mt-2">
+                  <p><strong>Name:</strong> {job.freelancer.name}</p>
+                  <p><strong>Email:</strong> {job.freelancer.email}</p>
+                  <p><strong>Skills:</strong> {job.freelancer.skills.join(", ")}</p>
+                  <p><strong>Experience:</strong> {job.freelancer.experience}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+    </div>
+  </div>
+)}
 
         {/* Payments & Escrow */}
         {activeTab === "payments" && (

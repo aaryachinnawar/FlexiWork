@@ -6,44 +6,56 @@ const PaymentButton = ({ job, client, freelancer, amount }) => {
         try {
             const { data } = await axios.post(`${VITE_APP_API}/api/payment/create-order`, {
                 job,
-                client, 
-                freelancer, 
+                client,
+                freelancer,
                 amount,
                 currency: "INR",
             });
 
             const { id, amount: orderAmount, currency } = data.order;
 
-            // ✅ Step 2: Open Razorpay Checkout
             const options = {
-                key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Store in .env
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID, 
                 amount: orderAmount,
                 currency,
                 name: "Freelancing Platform",
                 description: "Payment for Hiring Freelancer",
                 order_id: id,
                 handler: async (response) => {
-                    // ✅ Step 3: Verify Payment & Hire Freelancer
-                    await axios.post(`${VITE_APP_API}/api/payment/verify-payment`, {
-                        ...response,
-                        job,
-                        client,
-                        freelancer,
-                        amount,
-                    });
-                    alert("Payment Successful! Freelancer Hired!");
+                    try {
+                        await axios.post(`${VITE_APP_API}/api/payment/verify-payment`, {
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            job,
+                            client,
+                            freelancer,
+                            amount,
+                        });
+
+                        alert("Payment Successful! Freelancer Hired!");
+
+                        window.location.reload(); 
+                    } catch (error) {
+                        console.error("Payment verification failed:", error);
+                        alert("Payment verification failed. Please try again.");
+                    }
                 },
                 prefill: {
-                    name: "John Doe",
-                    email: "john@example.com",
-                    contact: "9999999999",
+                    name: client.name, 
+                    email: client.email,
+                    contact: "9999999999", 
+                },
+                theme: {
+                    color: "#4ECDC4", 
                 },
             };
 
             const paymentObject = new window.Razorpay(options);
             paymentObject.open();
         } catch (error) {
-            console.error(error);
+            console.error("Error creating Razorpay order:", error);
+            alert("Failed to initiate payment. Please try again.");
         }
     };
 
