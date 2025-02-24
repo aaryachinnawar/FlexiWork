@@ -26,7 +26,7 @@ const freelancerSchema = new mongoose.Schema({
     experience: {
         type: String,
         required: true,
-    },
+    }
 });
 
 export default mongoose.model('Freelancer', freelancerSchema);

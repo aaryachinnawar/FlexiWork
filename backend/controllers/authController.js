@@ -2,8 +2,9 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import Freelancer from '../models/Freelancer.js';
 import Client from '../models/Client.js';
+import dotenv from 'dotenv'
 
-const JWT_SECRET = "thisisaverylongstringforjwt";
+
 
 export const registerFreelancer = async (req, res) => {
     try{
@@ -24,7 +25,7 @@ export const registerFreelancer = async (req, res) => {
         });
         const token = jwt.sign(
             { freelancerId: freelancer._id },
-            JWT_SECRET,
+            process.env.JWT_SECRET,
             { expiresIn: "7d" }
         );
         res.status(201).json({ 
@@ -55,7 +56,7 @@ export const registerClient = async (req, res) => {
         });
         const token = jwt.sign(
             { clientId: client._id },
-            JWT_SECRET,
+            process.env.JWT_SECRET,
             { expiresIn: "7d" }
         );
         res.status(201).json({ client, token, message: "Client created successfully" });
@@ -81,7 +82,7 @@ export const loginUser = async (req, res) => {
             }
             const token = jwt.sign(
                 { freelancerId: freelancer._id },
-                JWT_SECRET,
+                process.env.JWT_SECRET,
                 { expiresIn: "7d" }
             );
             res.status(200).json({ freelancer, token, message: "Freelancer logged in successfully" });
@@ -93,7 +94,7 @@ export const loginUser = async (req, res) => {
             }
             const token = jwt.sign(
                 { clientId: client._id },
-                JWT_SECRET,
+                process.env.JWT_SECRET,
                 { expiresIn: "7d" }
             );
             res.status(200).json({ client, token , message: "Client logged in successfully" });

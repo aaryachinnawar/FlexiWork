@@ -23,7 +23,7 @@ const JobSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
-        enum: ['open', 'in-progress', 'completed'],
+        enum: ['open', 'hired', 'completed'],
         default: 'open',
     },
     createdAt: {

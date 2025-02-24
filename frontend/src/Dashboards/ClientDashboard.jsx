@@ -1,21 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Pie, Bar } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from "chart.js";
 import NavC from "../components/NavC";
 import Talents from "../components/Talents";
+import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
+import axios from 'axios'
+import FreelancersList from "../components/AllFreelancers";
+import PaymentButton from "../components/PaymentButton";
+
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 export default function ClientDashboard() {
+  const { auth } = useAuth();
   const [showJobForm, setShowJobForm] = useState(false);
   const [jobs, setJobs] = useState([]);
+  const [jobRequests, setJobRequests] = useState([]);
   const [activeTab, setActiveTab] = useState("talents");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     budget: "",
-    skills: ""
+    skillsRequired: "",
   });
 
   // Mock data for charts
@@ -29,6 +37,98 @@ export default function ClientDashboard() {
     }]
   };
 
+  const VITE_APP_API = import.meta.env.VITE_APP_API; 
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const { data } = await axios.get(`${VITE_APP_API}/api/jobs`, {
+          headers: { Authorization: `Bearer ${auth.token}` }
+        });
+  
+
+  
+        if (auth.client && Array.isArray(data)) {
+          const clientJobs = data.filter(job => job.client?._id === auth.client._id);
+          setJobs(clientJobs);
+        } else {
+          setJobs([]);
+        }
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+        toast.error("Failed to fetch jobs");
+      }
+    };
+    if (auth.client) {
+      fetchJobs();
+    }
+  }, [auth.client]);
+
+  useEffect(() => {
+    const fetchJobRequests = async () => {
+      try {
+        const { data } = await axios.get(`${VITE_APP_API}/api/jobs/requests/${auth.client?._id}`, {
+          headers: { Authorization: `Bearer ${auth.token}` },
+        });
+  
+        console.log("Fetched job requests:", data.jobRequests); // ✅ Debugging log
+        setJobRequests([...data.jobRequests]); // ✅ Force re-render
+      } catch (error) {
+        console.error("Error fetching job requests:", error);
+        toast.error("Failed to fetch job requests");
+      }
+    };
+  
+    if (auth.client) {
+      fetchJobRequests();
+    }
+  }, [auth.client]);
+  
+  
+  
+  const handleJobRequest = async (requestId, status) => {
+    try {
+        await axios.patch(`${VITE_APP_API}/api/jobs/request/respond`, 
+            { requestId, status }, 
+            { headers: { Authorization: `Bearer ${auth.token}` } }
+        );
+
+        // Update UI
+        setJobRequests(prevRequests => prevRequests.map(req => 
+            req._id === requestId ? { ...req, status } : req
+        ));
+
+        toast.success(`Request ${status}`);
+    } catch (error) {
+        console.error(`Error ${status} request:`, error);
+        toast.error(`Failed to ${status} request`);
+    }
+};
+
+  
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!auth.client) return toast.error("Only clients can post jobs");
+
+  try {
+    await axios.post(`${VITE_APP_API}/api/jobs/post`, { ...formData, client: auth.client._id }, {
+      headers: { Authorization: `Bearer ${auth.token}` },
+    });
+
+    toast.success("Job posted successfully!");
+    setFormData({ title: "", description: "", skillsRequired: "", budget: "" });
+
+    // Fetch updated jobs
+    const { data } = await axios.get(`${VITE_APP_API}/api/jobs`);
+    setJobs(data.filter(job => job.client?._id === auth.client._id));
+  } catch (error) {
+    toast.error("Failed to post job");
+    console.error("Error posting job:", error);
+  }
+};
+
+
   const escrowHistoryData = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May"],
     datasets: [{
@@ -40,17 +140,6 @@ export default function ClientDashboard() {
     }]
   };
 
-  const handlePostJob = (e) => {
-    e.preventDefault();
-    setJobs([...jobs, {
-      ...formData,
-      id: Date.now(),
-      proposals: [],
-      status: "active"
-    }]);
-    setShowJobForm(false);
-    setFormData({ title: "", description: "", budget: "", deadline: "" });
-  };
 
   return (
     <div className="bg-[#E0F4FF] min-h-screen p-8">
@@ -89,7 +178,7 @@ export default function ClientDashboard() {
         </div>
 
             {/* Default Talents View */}
-            {activeTab === "talents" && <Talents />}
+            {activeTab === "talents" && <FreelancersList/>}
 
             {/* Other Conditional Views */}
       
@@ -98,7 +187,7 @@ export default function ClientDashboard() {
         {showJobForm && (
           <div className="bg-white neo-brutalist p-6 mb-8 animate-slideDown">
             <h2 className="text-2xl font-bold mb-4">Post New Job</h2>
-            <form onSubmit={handlePostJob} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="text"
                 placeholder="Job Title"
@@ -126,13 +215,12 @@ export default function ClientDashboard() {
                 <input 
                   type="text"
                   placeholder="Skills"
-                  value={formData.skills}
-                  onChange={(e) => setFormData({...formData, skills: e.target.value})}
+                  value={formData.skillsRequired}
+                  onChange={(e) => setFormData({...formData, skillsRequired: e.target.value})}
                   className="p-2 neo-brutalist"
                   required
                 
                 />
-             
               </div>
               <button type="submit" className="neo-button bg-[#4ECDC4] text-black">
                 Post Job
@@ -141,38 +229,59 @@ export default function ClientDashboard() {
           </div>
         )}
 
-        {/* Active Projects */}
+        {/* Active Projects */} 
         {activeTab === "projects" && (
-          <div className="space-y-6">
-            {jobs.map(job => (
-              <div key={job.id} className="bg-white neo-brutalist p-6 animate-fadeIn">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold">{job.title}</h3>
-                    <p className="text-gray-600">Budget: ${job.budget}</p>
-                  </div>
-                  <span className="neo-brutalist px-3 py-1 text-sm">
-                    {job.status}
-                  </span>
-                </div>
-                <p className="mb-4">{job.description}</p>
-                
-                <h4 className="font-bold mb-2">Proposals ({job.proposals.length})</h4>
-                {job.proposals.length > 0 ? (
-                  job.proposals.map((proposal, index) => (
-                    <div key={index} className="neo-brutalist p-4 mb-3">
-                      <p className="font-bold">Freelancer Proposal #{index + 1}</p>
-                      <p>Bid: ${proposal.bid}</p>
-                      <p>{proposal.coverLetter}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500">No proposals yet</p>
-                )}
+      <div className="space-y-6">
+        {jobs.map(job => (
+          <div key={job._id} className="bg-white neo-brutalist p-6 animate-fadeIn">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h3 className="text-xl font-bold">{job.title}</h3>
+                <p className="text-gray-600">Budget: ${job.budget}</p>
               </div>
-            ))}
+              <span className="neo-brutalist px-3 py-1 text-sm">{job.status}</span>
+            </div>
+            <p className="mb-4">{job.description}</p>
+        
+            {/* Show Freelancer Requests for this Job */}
+            <h4 className="text-lg font-bold mt-4">Freelancer Requests:</h4>
+            {Array.isArray(jobRequests) && jobRequests.length > 0 ? (
+  jobRequests?.filter(req => req.job && req.job._id === job._id).map(request => (
+    <div key={request._id} className="bg-gray-100 p-4 rounded-md mt-2">
+      <p><strong>Freelancer:</strong> {request.freelancer.name}</p>
+      <p><strong>Status:</strong> {request.status}</p>
+
+      {request.status === "pending" && (
+        <div className="mt-2">
+          <button 
+            onClick={() => handleJobRequest(request._id, "accepted")} 
+            className="neo-button bg-green-500 text-white mr-2"
+          >
+            Accept
+          </button>
+          <button 
+            onClick={() => handleJobRequest(request._id, "rejected")} 
+            className="neo-button bg-red-500 text-white"
+          >
+            Reject
+          </button>
+        </div>
+      )}
+
+      {request.status === "accepted" && (
+        <PaymentButton job={job._id} client={job.client} freelancer={job.freelancer} amount={job.budget} />
+      )}
+    </div>
+  ))
+) : (
+  <p className="text-gray-500">No requests yet.</p>
+)}
+
           </div>
-        )}
+        ))}
+      </div>
+    )}
+
 
         {/* Payments & Escrow */}
         {activeTab === "payments" && (

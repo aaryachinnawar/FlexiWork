@@ -1,57 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Pie, Bar } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from "chart.js";
+import axios from "axios";
 import NavF from "../components/NavF";
-import job from "../Pages/Jobs"
 import Jobs from "../Pages/Jobs";
+const VITE_APP_API = import.meta.env.VITE_APP_API
 
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 export default function FreelancerDashboard() {
-  const [showProposalForm, setShowProposalForm] = useState(false);
-  const [coverLetter, setCoverLetter] = useState("");
-  const [bidAmount, setBidAmount] = useState("");
+  const [messages, setMessages] = useState([]);
 
-  // Dummy data for charts
-  const earningsData = {
-    labels: ["Completed", "Pending", "Cancelled"],
-    datasets: [
-      {
-        label: "Projects",
-        data: [12, 5, 3],
-        backgroundColor: ["#FF6B6B", "#4ECDC4", "#FFE66D"],
-        borderColor: "#000",
-        borderWidth: 2,
-      },
-    ],
-  };
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const response = await axios.get(`${VITE_APP_API}/api/messages/freelancer`, {
+          headers: { Authorization: localStorage.getItem("token") }
+        });
+        setMessages(response.data);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
 
-  const analyticsData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-    datasets: [
-      {
-        label: "Earnings ($)",
-        data: [500, 800, 1200, 900, 1500, 2000],
-        backgroundColor: "#4ECDC4",
-        borderColor: "#000",
-        borderWidth: 2,
-      },
-    ],
-  };
-
-  const handleSubmitProposal = (e) => {
-    e.preventDefault();
-    alert(`Proposal submitted!\nCover Letter: ${coverLetter}\nBid Amount: $${bidAmount}`);
-    setShowProposalForm(false);
-    setCoverLetter("");
-    setBidAmount("");
-  };
+    fetchMessages();
+  }, []);
 
   return (
     <div className="bg-[#E0F4FF] min-h-screen p-8">
-      <NavF/>
+      <NavF />
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold mb-8">Freelancer Dashboard</h1>
 
@@ -68,57 +46,26 @@ export default function FreelancerDashboard() {
           </button>
         </div>
 
-        {/* Proposals Section */}
-        <div className="bg-white neo-brutalist p-6 mb-8">
-          <h2 className="text-2xl font-bold mb-4">Proposals</h2>
-          <button
-            onClick={() => setShowProposalForm(!showProposalForm)}
-            className="neo-button bg-[#4ECDC4] text-black font-bold py-2 px-4 mb-4"
-          >
-            Submit Proposal
-          </button>
-
-          {showProposalForm && (
-            <form onSubmit={handleSubmitProposal} className="space-y-4">
-              <div>
-                <label className="block font-bold mb-2">Cover Letter</label>
-                <textarea
-                  value={coverLetter}
-                  onChange={(e) => setCoverLetter(e.target.value)}
-                  className="w-full p-2 neo-brutalist"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block font-bold mb-2">Bid Amount ($)</label>
-                <input
-                  type="number"
-                  value={bidAmount}
-                  onChange={(e) => setBidAmount(e.target.value)}
-                  className="w-full p-2 neo-brutalist"
-                  required
-                />
-              </div>
-              <button type="submit" className="neo-button bg-[#FF6B6B] text-white font-bold py-2 px-4">
-                Submit
-              </button>
-            </form>
+        {/* Messages Section */}
+        <div className="bg-white p-6 rounded shadow-md">
+          <h2 className="text-2xl font-bold mb-4">Messages</h2>
+          {messages.length === 0 ? (
+            <p className="text-gray-600">No messages yet.</p>
+          ) : (
+            <ul className="divide-y divide-gray-200">
+              {messages.map((msg, index) => (
+                <li key={index} className="p-4 border-b">
+                  <p className="text-gray-800 font-semibold">{msg.clientName} sent you a message:</p>
+                  <p className="text-gray-600">{msg.message}</p>
+                  <span className="text-gray-400 text-sm">{new Date(msg.createdAt).toLocaleString()}</span>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
 
-        {/* Earnings and Analytics Section */}
-        <div className="">
-          {/* <div className="bg-white neo-brutalist p-6">
-            <h2 className="text-2xl font-bold mb-4">Earnings Overview</h2>
-            <Pie data={earningsData} />
-          </div>
-
-          <div className="bg-white neo-brutalist p-6">
-            <h2 className="text-2xl font-bold mb-4">Monthly Analytics</h2>
-            <Bar data={analyticsData} />
-          </div> */}
-           <Jobs/>
-
+        <div className="mt-8">
+          <Jobs />
         </div>
       </div>
     </div>

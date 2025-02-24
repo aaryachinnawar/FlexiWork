@@ -7,7 +7,6 @@ import Signup from "./Access/Signup";
 import FreelancerDashboard from "./Dashboards/FreelancerDashboard";
 import ClientDashboard from "./Dashboards/ClientDashboard";
 
-import JobListings from "./FreeLancer/JobListings";
 import HomeF from "./Pages/HomeF"
 import HomeC from "./Pages/HomeC"
 
@@ -30,7 +29,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="/dashboard" element={<FreelancerDashboard />} />
           <Route path="/client-dashboard" element={<ClientDashboard />} />
 
-          <Route path="/jobs" element={<JobListings />} />
           <Route path="/homef" element={<HomeF />} />
           <Route path="/homec" element={<HomeC />} />
 
