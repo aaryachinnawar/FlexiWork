@@ -18,8 +18,8 @@ const PaymentButton = ({ job, client, freelancer, amount }) => {
                 key: import.meta.env.VITE_RAZORPAY_KEY_ID, 
                 amount: orderAmount,
                 currency,
-                name: "Freelancing Platform",
-                description: "Payment for Hiring Freelancer",
+                name: "FLEXIWORK",
+                description: "Payment",
                 order_id: id,
                 handler: async (response) => {
                     try {
@@ -33,7 +33,7 @@ const PaymentButton = ({ job, client, freelancer, amount }) => {
                             amount,
                         });
 
-                        alert("Payment Successful! Freelancer Hired!");
+                        alert("Payment Successful1");
 
                         window.location.reload(); 
                     } catch (error) {
