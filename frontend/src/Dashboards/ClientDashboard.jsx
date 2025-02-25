@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { Pie, Bar } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from "chart.js";
 import NavC from "../components/NavC";
-import Talents from "../components/Talents";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 import axios from 'axios'
@@ -50,9 +48,13 @@ export default function ClientDashboard() {
         const { data } = await axios.get(`${VITE_APP_API}/api/jobs`, {
           headers: { Authorization: `Bearer ${auth.token}` },
         });
-    
+  
+        console.log("Fetched Jobs:", data); // Debugging: Inspect the fetched jobs
+  
         if (auth.client && Array.isArray(data)) {
+          // Filter jobs created by the logged-in client
           const clientJobs = data.filter(job => job.client?._id === auth.client._id);
+          console.log("Client Jobs:", clientJobs); // Debugging: Inspect the filtered jobs
           setJobs(clientJobs);
         } else {
           setJobs([]);
@@ -62,6 +64,7 @@ export default function ClientDashboard() {
         toast.error("Failed to fetch jobs");
       }
     };
+  
     if (auth.client) {
       fetchJobs();
     }
