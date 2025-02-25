@@ -37,6 +37,11 @@ export default function ClientDashboard() {
     }]
   };
 
+  const handleVideoChat = () => {
+    window.open("http://localhost:3030", "_blank");
+  };
+  
+
   const VITE_APP_API = import.meta.env.VITE_APP_API; 
 
   useEffect(() => {
@@ -266,7 +271,16 @@ const handleSubmit = async (e) => {
               </div>
               <span className="neo-brutalist px-3 py-1 text-sm">{job.status}</span>
             </div>
-            <p className="mb-4">{job.description}</p>
+            
+            <div className="flex justify-between items-start mb-4">
+              <div>
+              <p className="mb-4">{job.description}</p>
+              </div>
+              <button className="neo-brutalist bg-[#ff6b6b] px-3 py-1 text-sm" onClick={handleVideoChat}>Let's Chat</button>
+            </div>
+
+            
+          
 
             {/* Freelancer Requests */}
             <h4 className="text-lg font-bold mt-4">Freelancer Requests:</h4>
@@ -365,7 +379,12 @@ const handleSubmit = async (e) => {
               </div>
               <span className="neo-brutalist px-3 py-1 text-sm">{job.status}</span>
             </div>
-            <p className="mb-4">{job.description}</p>
+            <div className="flex justify-between items-start mb-4">
+              <div>
+              <p className="mb-4">{job.description}</p>
+              </div>
+              <button className="neo-brutalist bg-[#ff6b6b] px-3 py-1 text-sm">Let's Chat</button>
+            </div>
 
             {/* Freelancer Profile */}
             {job.freelancer && (

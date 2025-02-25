@@ -24,6 +24,10 @@ const Jobs = () => {
   
       fetchJobs();
     }, []);
+
+    const handleVideoChat = () => {
+      window.open("http://localhost:3030", "_blank");
+    };
   
     // Handle job application
     const handleSendRequest = async (jobId, clientId) => {
@@ -77,6 +81,8 @@ const Jobs = () => {
                     <span className="bg-[#4ECDC4] text-black px-3 py-1 border-2 border-black shadow-[2px_2px_0_0_#000] text-sm font-bold">
                       Budget: ${job.budget}
                     </span>
+
+                    <button className="bg-[#ff6b6b] text-black px-3 py-1 border-2 border-black shadow-[2px_2px_0_0_#000] text-sm font-bold" onClick={handleVideoChat}>Let's Chat</button>
   
                     {/* Send Request Button */}
                     <button
